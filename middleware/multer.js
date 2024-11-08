@@ -25,7 +25,7 @@ const storage = multer.diskStorage({
 
 const filter = (req, file, callback) => {
   const ext = path.extname(file.originalname).toLowerCase();
-
+  const whitelist = [".jpg", ".jpeg", ".png", ".webp"];
   if (!whitelist.includes(ext)) {
     return callback(new Error("Ce type de fichier n'est pas authorisé"));
   }
@@ -33,4 +33,6 @@ const filter = (req, file, callback) => {
   callback(null, true);
 };
 
-module.exports = multer({ storage: storage }).single("image");
+module.exports = multer({ storage: storage, fileFilter: filter }).single(
+  "image"
+);
