@@ -1,40 +1,30 @@
 const sharp = require("sharp");
 const fs = require("fs");
 const path = require("path");
+const { log } = require("console");
 
 const processImage = (req, res, next) => {
   if (req.file) {
     const webpFilename = req.file.filename.replace(/\.[^.]+$/, ".webp");
-    const webpImagePath = path.join("images", webpFilename);
+    const webpImagePath = path.join("images", "resized" + webpFilename);
 
     const newWidth = 400;
     const newHeight = 600;
 
     sharp(req.file.path)
       .resize(newWidth, newHeight)
+      .toFormat("webp")
       .webp({ quality: 80 })
-      .toFile(webpImagePath, (err, info) => {
-        if (err) {
-          console.error("Erreur lors du traitement de l'image");
-          return res.status(500).json({
-            error: "Erreur lors du traitement de l'image",
-          });
-        }
-
-        //To delete the old image
+      .toFile(webpImagePath)
+      .then(() => {
         fs.unlink(req.file.path, (err) => {
-          if (err) {
-            console.error("Erreur lors de la suppression de l'image");
-          } else {
-            console.log("Ancienne image supprimee avec succes !");
-          }
+          req.file.filename = webpFilename;
+          next();
         });
-
-        req.file.filename = webpFilename;
-        next();
+      })
+      .catch((err) => {
+        console.log(err);
       });
-  } else {
-    next();
   }
 };
 
