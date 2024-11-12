@@ -4,7 +4,11 @@ const path = require("path");
 const { log } = require("console");
 
 const processImage = (req, res, next) => {
+  console.log("Sharp middleware triggered");
+
   if (req.file) {
+    console.log("Sharp inside middleware triggered");
+    console.log("sharp process");
     const webpFilename = req.file.filename.replace(/\.[^.]+$/, ".webp");
     const webpImagePath = path.join("images", "resized" + webpFilename);
 
@@ -25,6 +29,9 @@ const processImage = (req, res, next) => {
       .catch((err) => {
         console.log(err);
       });
+  } else {
+    console.log("No file uploaded, proceeding to modifyBook");
+    next(); // No image uploaded, still proceed to the next middleware
   }
 };
 
