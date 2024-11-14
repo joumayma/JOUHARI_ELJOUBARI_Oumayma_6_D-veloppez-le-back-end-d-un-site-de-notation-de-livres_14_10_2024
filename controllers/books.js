@@ -67,7 +67,9 @@ exports.modifyBook = (req, res, next) => {
                   err
                 );
               } else {
-                console.log("Ancienne image supprimée avec succès");
+                console.log(
+                  `Ancienne image supprimée avec succès  ${oldFilename} `
+                );
               }
             });
           }
@@ -96,8 +98,10 @@ exports.deleteBook = (req, res, next) => {
         const filename = book.imageUrl.split("/images/")[1];
         fs.unlink(`images/${filename}`, () => {
           Book.deleteOne({ _id: req.params.id })
-            .then((books) =>
-              res.status(200).json({ message: "Objet supprime !" })
+            .then((book) =>
+              res
+                .status(200)
+                .json({ message: `Objet supprime ! ${filename}  |  ${book}` })
             )
             .catch((error) => res.status(404).json({ error }));
         });
